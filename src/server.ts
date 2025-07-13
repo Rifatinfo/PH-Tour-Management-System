@@ -4,6 +4,7 @@ import { Server } from "http"
 import mongoose from "mongoose";
 import app from "./app";
 import { envVars } from "./app/modules/config/env";
+import { seedSuperAdmin } from "./app/modules/utils/seedSuperAdmin";
 
 let server: Server;
 const startServer = async () => {
@@ -20,26 +21,13 @@ const startServer = async () => {
         console.log(error);
     }
 }
-process.on("unhandledRejection", () => {
-    console.log("UnHandle Rejection detected... Server shut down");
 
-    if (server) {
-        server.close(() => {
-            process.exit(1)
-        })
-    }
-    process.exit(1)
-})
-process.on("uncaughtException", () => {
-    console.log("uncaughtException detected... Server shut down");
+(async () => {
+    await startServer()
+    await seedSuperAdmin()
+})()
 
-    if (server) {
-        server.close(() => {
-            process.exit(1)
-        })
-    }
-    process.exit(1)
-})
+
 process.on("SIGTERM", () => {
     console.log("SIGTERM signal received detected... Server shut down");
 
@@ -60,5 +48,26 @@ process.on("SIGINT", () => {
     }
     process.exit(1)
 })
-startServer();
+
+process.on("unhandledRejection", () => {
+    console.log("UnHandle Rejection detected... Server shut down");
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        })
+    }
+    process.exit(1)
+})
+process.on("uncaughtException", () => {
+    console.log("uncaughtException detected... Server shut down");
+
+    if (server) {
+        server.close(() => {
+            process.exit(1)
+        })
+    }
+    process.exit(1)
+})
+
 
